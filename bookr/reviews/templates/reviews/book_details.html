@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="margin-left: 20px; padding-left: 10px; padding-top: 20px;">
+<h1>Book Details</h1>
+ <hr>
+      <span class="text-info">Title: </span> <span>{{book.title}}</span>
+      <br>
+      <span class="text-info">Publisher: </span><span>{{book.publisher}}</span>
+      <br>
+      <span class="text-info">Publication Date: </span><span>{{book.publication_date}}</span>
+      <br>
+      <span class="text-info">Overall Rating: </span><span class="badge badge-primary badge-pill">{{book_rating}}</span>
+      <br>
+      {% if book_rating is null%}
+      <span class="text-secondary">This books does not have any review yet</span>
+      <br>
+      {% endif %}
+      <hr>
+</div>
+<div style="margin-left: 20px; padding-left: 20px;">
+<h1>Review Comments</h1>
+ <hr>
+    <ul class="list-group">
+      {% for review in review_list %}
+          <li class="list-group-item">
+
+              <span class="text-info">Review Comment: </span> <span>{{review.content}}</span>
+              <br>
+              <span class="text-info">Created: </span><span>{{review.date_created}}</span>
+              <br>
+              <span class="text-info">Modified: </span><span>{{review.date_edited}}</span>
+              <br>
+              <span class="text-info">Rating: </span><span class="badge badge-primary badge-pill">{{review.rating}}</span>
+              <br>
+              <span class="text-info">Creator: </span><span>{{review.creator}}</span>
+              <br>
+
+          </li>
+          {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+

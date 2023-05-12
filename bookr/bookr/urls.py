@@ -20,6 +20,4 @@ import reviews.views  # IMPORTANT!
 
 urlpatterns = [path('admin/', admin.site.urls),
                # path('', reviews.views.index,name='index'),
-               path('search/', reviews.views.search, name='book'),
-               # The include function is a shortcut that allows you to combine URL configuration
                path('', include('reviews.urls'))]

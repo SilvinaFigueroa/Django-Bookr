@@ -1,38 +1,56 @@
-from django.shortcuts import render
+from django.db.models import Avg
+from django.db.models.functions import Round
+from django.shortcuts import render, get_object_or_404
+from .models import *
+from .utils import average_rating
 
 
-# from django.http import HttpResponse
-# This is what is used to create the response that goes back to the web browser
+def book_list(request):
+    books = Book.objects.all()
+    book_list = []
 
-# def index(request):
-#     name = request.GET.get("name") or "world"
-#     return HttpResponse("Hello, {}!".format(name))
-#
-#     # http://127.0.0.1:8000/?name=Silvina
+    for book in books:
+        reviews = book.review_set.all()
 
-def index(request, name='User'):
-    name = request.GET.get("name", name)
-    context = {"name": name}
-    return render(request, "review_base.html", context)
+        if reviews:
+            book_rating = average_rating([review.rating for review in reviews])
+            number_of_reviews = len(reviews)
+        else:
+            book_rating = None
+            number_of_reviews = 0
+
+        book_list.append({'book': book, \
+                          'book_rating': book_rating, \
+                          'number_of_reviews': number_of_reviews})
+    context = {
+        'book_list': book_list
+    }
+    # request - URL - return for displaying on template
+    return render(request, 'reviews/books_list.html', context)
 
 
-def search(request, book='My Book'):
-    book = request.GET.get("book", book)
-    context = {"book": book}
-    return render(request, "search.html", context)
+def book_details(request, id):
+    book = get_object_or_404(Book, id=id)
+    reviews = book.review_set.all()
+    review_list = []
 
+    for element in reviews:
 
-# from django.http import HttpResponse
-# from .models import Book
+        content = element.content
+        rating = element.rating
+        date_created = element.date_created
+        date_edited = element.date_edited
+        creator = element.creator
 
-## function using HTML inside it
+        review_list.append({
+            "content": content,
+            "rating": rating,
+            "date_created": date_created,
+            "date_edited": date_edited,
+            "creator": creator})
 
-# def welcome_view(request):
-#     message = f'<html><h1>Welcome to Bookr!</h1> ' \
-#               f'<p>{Book.objects.count()} books and counting!</p></html>'
-#
-#     return HttpResponse(message)
+    book_rating = reviews.aggregate(avg_rating=Round(Avg('rating'), 2))['avg_rating']
 
-# function using a template to render the view
-def welcome_view(request):
-    return render(request, 'base.html')
+    context = {"book": book, "book_rating": book_rating, "review_list": review_list}
+
+    return render(request, 'reviews/book_details.html', context)
