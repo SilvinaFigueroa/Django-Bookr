@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,7 +27,6 @@ SECRET_KEY = 'django-insecure-17f67=w)0u1o+93(h!8_4tnr*0^$)ljhlrv1*4+45hz8-xixko
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -57,9 +55,19 @@ ROOT_URLCONF = 'bookr.urls'
 
 TEMPLATES = [
     {
+        # BACKEND: template engine - API used by Django to work with HTML templates
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # DIRS list of directories where Django searches for the templates in the given order
+        # Django searches for templates present only in the app folders' template directory
+        # reviews/templates in this case if the [] are empty.
+
+        'DIRS': [os.path.join(BASE_DIR,'bookr', 'templates')],
+        # a new path was added to use the templates on bookr/template
+
+        # APP_DIRS tells the Django template engine whether it should look for templates
+        # in the installed apps defined under INSTALLED_APPS in the settings.py file
         'APP_DIRS': True,
+        # OPTIONS: dictionary containing template engine-specific settings
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -73,7 +81,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bookr.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -83,7 +90,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -103,7 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -114,7 +119,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
