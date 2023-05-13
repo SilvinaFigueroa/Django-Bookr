@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 import reviews.views  # IMPORTANT!
 
+
 urlpatterns = [path('admin/', admin.site.urls),
                # path('', reviews.views.index,name='index'),
                path('', include('reviews.urls'))]

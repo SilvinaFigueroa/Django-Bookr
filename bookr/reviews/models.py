@@ -54,6 +54,8 @@ class BookContributor(models.Model):
     role = models.CharField(verbose_name="The role this contributor had in the book.",
                             choices=ContributionRole.choices, max_length=20)
 
+    def __str__(self):
+        return self.contributor
 
 class Review(models.Model):
     content = models.TextField(help_text="The Review text.")
