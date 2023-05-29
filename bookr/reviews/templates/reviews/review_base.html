@@ -1,0 +1,10 @@
+
+    <!--extending the bookr template html -->
+    {%extends 'base.html' %}
+    <!-- adding load static to be able to use static template tag -->
+    {% load static %}
+    <!-- overriding the block brand with the logo (static tag) -->
+    {% block brand %}
+      <img src="{% static 'reviews/logo.png' %}">
+    {% endblock %}
+

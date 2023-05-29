@@ -1,0 +1,52 @@
+{% extends 'reviews/review_base.html' %}
+
+<!--Add a title block that will display Search Results for <search_input> if the form is valid and search_input
+was set and will otherwise just display Book Search.-->
+{% block title %}
+    {% if form.is_valid and search_input %}
+        Search Results for "{{ search_input }}"
+    {% else %}
+        Book Search
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <br>
+    <h2>Search for Books</h2>
+    <br>
+    <form>
+<!--    token not needed, form method is not post-->
+<!--    {% csrf_token %}-->
+    {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Search books</button>
+    </form>
+
+<!--perform next block if form is valid and search input is not empty-->
+        {% if form.is_valid and search_input %}
+            <br>
+            <h3>Search Results for <em>"{{search_input}}</em></h3>
+            <br>
+            <!--wrap the results in <ul> with class list-group-->
+                <ul class="list-group">
+                    {% for book in search_results %}
+                    <!--display each book with an <li> instance with a list-group-item -->
+                      <li class="group-item">
+                          <span class="text-info">Title: </span> <a href="{% url 'book_details' book.id%}"> {{book}} </a>
+                          <br/>
+                          <span class="text-info">Contributors: </span>
+                            {% for contributor in book.contributors.all %}
+                                {{ contributor.first_names }} {{ contributor.last_names }}{% if not forloop.last %},
+                          <!-- forloop.last special variable to exclude a trailing comma-->
+                          {% endif %}
+                        {% endfor %}
+                      </li>
+                    {% empty %}
+                        <li class="list-group-item">No results found.</li>
+                    {% endfor %}
+                </ul>
+
+        {%endif%}
+    </div>
+    {%endblock%}
+
