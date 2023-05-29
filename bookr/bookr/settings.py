@@ -60,8 +60,7 @@ TEMPLATES = [
         # Django searches for templates present only in the app folders' template directory
         # reviews/templates in this case if the [] are empty.
 
-        'DIRS': [os.path.join(BASE_DIR,'bookr', 'templates')],
-        # a new path was added to use the templates on bookr/template
+        'DIRS': [os.path.join(BASE_DIR, 'bookr', 'templates')], # Path to main base template
 
         # APP_DIRS tells the Django template engine whether it should look for templates
         # in the installed apps defined under INSTALLED_APPS in the settings.py file
@@ -122,9 +121,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'bookr/static')]

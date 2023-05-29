@@ -28,6 +28,11 @@ class Book(models.Model):
     contributors = models.ManyToManyField('Contributor',
                                           through="BookContributor")
 
+    def isbn13(self):
+        """ '9780316769174' => '978-0-31-676917-4' """
+        return "{}-{}-{}-{}-{}".format \
+            (self.isbn[0:3], self.isbn[3:4], self.isbn[4:6], self.isbn[6:12], self.isbn[12:13])
+
     def __str__(self):
         return self.title
 
@@ -40,10 +45,16 @@ class Contributor(models.Model):
                                   help_text="The contributor's last name or names.")
     email = models.EmailField(help_text="The contact email for the contributor.")
 
+    def initialled_name(self):
+        return "{},{}".format(self.last_names, self.first_names[0:1])
+
     def __str__(self):
-        return self.first_names
+        return self.initialled_name()
+
+
 class BookContributor(models.Model):
     """ intermediary table  to establish relationships by using foreign keys to both the Book and Contributor tables """
+
     class ContributionRole(models.TextChoices):
         AUTHOR = "AUTHOR", "Author"
         CO_AUTHOR = "CO_AUTHOR", "Co-Author"
@@ -56,6 +67,7 @@ class BookContributor(models.Model):
 
     def __str__(self):
         return self.contributor
+
 
 class Review(models.Model):
     content = models.TextField(help_text="The Review text.")
