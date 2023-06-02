@@ -40,12 +40,21 @@
           </form>
           </div>
         </nav>
-         {% block content %}
-        <div class="container">
-        <h1>Welcome to Bookr!</h1>
-        </div>
-        {% endblock %}
 
+        <div cclass="container-fluid">
+           {%for%}
+            <!--Override the bootstrap default message for error alert-danger for Django's error tag-->
+            <div class="alert alert-{% if message.level_tag == 'error' %}danger{% else %}{ {message.level_tag }}{% endif %}" role="alert">
+            {{ message }}
+            </div>
+            {%endfor%}
+
+             {% block content %}
+            <div class="container">
+            <h1>Welcome to Bookr!</h1>
+            </div>
+            {% endblock %}
+        </div>
   <!-- Footer -->
   <footer class="page-footer font-small blue">
     <div class="footer-copyright text-center py-3">© 2023 Copyright:

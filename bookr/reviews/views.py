@@ -1,8 +1,8 @@
 from django.db.models import Avg, Q
 from django.db.models.functions import Round
-from django.shortcuts import render, get_object_or_404
-
-from .forms import SearchForm
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .forms import SearchForm, PublisherForm
 from .models import *
 from .utils import average_rating
 
@@ -29,7 +29,6 @@ def book_search(request):
 
         else:
             # Using a Q object to combine conditions and retrieve contributors from DB
-
             if search_in == "title":
                 search_results = Book.objects.filter(title__icontains=search)
             else:
@@ -90,3 +89,30 @@ def book_details(request, id):
     context = {"book": book, "book_rating": book_rating, "review_list": review_list}
 
     return render(request, 'reviews/book_details.html', context)
+
+
+def publisher_edit(request, pk=None):
+    # validating is we are editing a existing publisher record or creating a new one
+    if pk is not None:
+        publisher = get_object_or_404(Publisher, pk=pk)
+    else:
+        publisher = None
+
+    if request.method == "POST":
+        form = PublisherForm(request.POST, instance=publisher)
+
+        if form.is_valid:
+            updated_publisher = form.save()
+            # register a different success message depending on whether the Publisher instance was created or updated.
+            if publisher is None:
+                messages.success(request, "Publisher \"{}\" was created.".format(updated_publisher))
+            else:
+                messages.success(request, "Publisher \"{}\" was updated.".format(updated_publisher))
+
+            return redirect("publisher_edit", updated_publisher.pk)
+
+    else:
+        # form fields are initialized with the data from the publisher object.
+        form = PublisherForm(instance=publisher)
+
+    return render(request, "reviews/form-example.html", {"method": request.method, "form": form})

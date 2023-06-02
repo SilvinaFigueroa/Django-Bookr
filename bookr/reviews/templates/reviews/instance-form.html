@@ -1,0 +1,33 @@
+{% extends 'reviews/review_base.html' %}
+
+{% block title %}
+    {% if {{instance}} is not None %}
+        Editing  {{ model_type }} {{ publisher }}
+    {% else %}
+       New Publisher
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  <h2>
+      {% if {{instance}} is not None %}
+    Editing  {{ model_type }} <em>{{ publisher }}</em>
+      {% else %}
+         New Publisher
+      {% endif %}
+  </h2>
+
+  <form method="Post">
+      {% csrf_token %}
+      {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">
+      {% if {{instance}} is not None %}
+      Save
+      {%else%}
+      Create
+    </button>
+  </form>
+
+{%endblock%}
