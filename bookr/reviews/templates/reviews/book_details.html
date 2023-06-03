@@ -2,43 +2,48 @@
 
 {% block content %}
 <div style="margin-left: 20px; padding-left: 10px; padding-top: 20px;">
-<h1>Book Details</h1>
- <hr>
-      <span class="text-info">Title: </span> <span>{{book.title}}</span>
-      <br>
-      <span class="text-info">Publisher: </span><span>{{book.publisher}}</span>
-      <br>
-      <span class="text-info">Publication Date: </span><span>{{book.publication_date}}</span>
-      <br>
-      <span class="text-info">Overall Rating: </span><span class="badge badge-primary badge-pill">{{book_rating}}</span>
-      <br>
-      {% if book_rating is null%}
-      <span class="text-secondary">This books does not have any review yet</span>
-      <br>
-      {% endif %}
-      <hr>
-</div>
-<div style="margin-left: 20px; padding-left: 20px;">
-<h1>Review Comments</h1>
- <hr>
-    <ul class="list-group">
-      {% for review in review_list %}
-          <li class="list-group-item">
 
-              <span class="text-info">Review Comment: </span> <span>{{review.content}}</span>
-              <br>
-              <span class="text-info">Created: </span><span>{{review.date_created}}</span>
-              <br>
-              <span class="text-info">Modified: </span><span>{{review.date_edited}}</span>
-              <br>
-              <span class="text-info">Rating: </span><span class="badge badge-primary badge-pill">{{review.rating}}</span>
-              <br>
-              <span class="text-info">Creator: </span><span>{{review.creator}}</span>
-              <br>
+    <h1>Book Details</h1>
+     <hr>
+          <span class="text-info">Title: </span> <span>{{book.title}}</span>
+          <br>
+          <span class="text-info">Publisher: </span><span>{{book.publisher}}</span>
+          <br>
+          <span class="text-info">Publication Date: </span><span>{{book.publication_date}}</span>
+          <br>
+          <span class="text-info">Overall Rating: </span><span class="badge badge-primary badge-pill">{{book_rating}}</span>
+          <br>
 
-          </li>
-          {% endfor %}
-    </ul>
-</div>
+    <!--Validation to add a new review or edit a current one-->
+        {% if not reviews %}
+                <span class="text-secondary">This books does not have any review yet</span>
+                <br>
+        {%else%}
+                <hr>
+                </div>
+                <div style="margin-left: 20px; padding-left: 20px;">
+                <h3>Review Comments</h3>
+                <ul>
+                {% for review in reviews %}
+                      <li class="list-group-item">
+                            <span class="text-info">Review comment: </span> <span>{{ review.content }}</span>
+                            <br>
+                            <span class="text-info">Created on: </span><span>{{ review.date_created }}</span>
+                            <br>
+                            <span class="text-info">Modified on: </span><span>{{ review.date_edited }}</span>
+                            <br>
+                            <span class="text-info">Rating: </span><span class="badge badge-secondary badge-pill">{{ review.rating }}</span>
+                            <br>
+                            <span class="text-info">Creator: </span><span>{{ review.creator.username }}</span>
+                            <br>
+                            <a href="{% url 'review_edit' book.pk review.pk %}">Edit Review</a>
+                      </li>
+                {% endfor %}
+                    </ul>
+
+          {% endif %}
+      <!--Button  to create a review.-->
+      <a class="btn btn-primary" href="{% url 'review_create' book.pk %}">Add Review</a>
+    </div>
 {% endblock %}
 

@@ -1,32 +1,38 @@
 {% extends 'reviews/review_base.html' %}
 
 {% block title %}
-    {% if {{instance}} is not None %}
-        Editing  {{ model_type }} {{ publisher }}
+    {% if instance%}
+        Editing {{ model_type }} {{ instance }}
     {% else %}
-       New Publisher
+       New {{ model_type }}
     {% endif %}
 {% endblock %}
 
 {% block content %}
+<div style="margin-left: 20px; padding-left: 10px; padding-top: 20px;">
 
-  <h2>
-      {% if {{instance}} is not None %}
-    Editing  {{ model_type }} <em>{{ publisher }}</em>
-      {% else %}
-         New Publisher
-      {% endif %}
-  </h2>
-
-  <form method="Post">
+    <h2>
+        {% if instance %}
+            Editing {{ model_type }} <em>{{ instance }}</em>
+        {% else %}
+            New {{ model_type }}
+        {% endif %}
+    </h2>
+        <!--Added for review_edit view-->
+        {% if related_model_type and related_instance %}
+           <p>For {{related_model_type}} <em>{{related_instance}}</em></p>
+        {% endif %}
+</div>
+  <form method="Post" class="container">
       {% csrf_token %}
       {{ form.as_p }}
 
     <button type="submit" class="btn btn-primary">
-      {% if {{instance}} is not None %}
+      {% if instance is not None %}
       Save
       {%else%}
-      Create
+      Create {%endif%}
+
     </button>
   </form>
 

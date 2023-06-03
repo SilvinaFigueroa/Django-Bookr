@@ -2,7 +2,9 @@ from django.db.models import Avg, Q
 from django.db.models.functions import Round
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .forms import SearchForm, PublisherForm
+from django.utils import timezone
+
+from .forms import SearchForm, PublisherForm, ReviewForm
 from .models import *
 from .utils import average_rating
 
@@ -65,34 +67,50 @@ def book_list(request):
     return render(request, 'reviews/books_list.html', context)
 
 
-def book_details(request, id):
-    book = get_object_or_404(Book, id=id)
+# def book_details(request, id):
+#     book = get_object_or_404(Book, id=id)
+#     reviews = book.review_set.all()
+#     review_list = []
+#
+#     for element in reviews:
+#         content = element.content
+#         rating = element.rating
+#         date_created = element.date_created
+#         date_edited = element.date_edited
+#         creator = element.creator
+#
+#         review_list.append({
+#             "content": content,
+#             "rating": rating,
+#             "date_created": date_created,
+#             "date_edited": date_edited,
+#             "creator": creator})
+#
+#     book_rating = reviews.aggregate(avg_rating=Round(Avg('rating'), 2))['avg_rating']
+#     context = {"book": book, "book_rating": book_rating, "review_list": review_list}
+#
+#     return render(request, 'reviews/book_details.html', context)
+
+def book_details(request, pk):
+    book = get_object_or_404(Book, pk=pk)
     reviews = book.review_set.all()
-    review_list = []
-
-    for element in reviews:
-        content = element.content
-        rating = element.rating
-        date_created = element.date_created
-        date_edited = element.date_edited
-        creator = element.creator
-
-        review_list.append({
-            "content": content,
-            "rating": rating,
-            "date_created": date_created,
-            "date_edited": date_edited,
-            "creator": creator})
-
-    book_rating = reviews.aggregate(avg_rating=Round(Avg('rating'), 2))['avg_rating']
-
-    context = {"book": book, "book_rating": book_rating, "review_list": review_list}
-
+    if reviews:
+        book_rating = average_rating([review.rating for review in reviews])
+        context = {
+            "book": book,
+            "book_rating": book_rating,
+            "reviews": reviews
+        }
+    else:
+        context = {
+            "book": book,
+            "book_rating": None,
+            "reviews": None
+        }
     return render(request, 'reviews/book_details.html', context)
 
-
 def publisher_edit(request, pk=None):
-    # validating is we are editing a existing publisher record or creating a new one
+    # validating is we are editing an existing publisher record or creating a new one
     if pk is not None:
         publisher = get_object_or_404(Publisher, pk=pk)
     else:
@@ -101,7 +119,7 @@ def publisher_edit(request, pk=None):
     if request.method == "POST":
         form = PublisherForm(request.POST, instance=publisher)
 
-        if form.is_valid:
+        if form.is_valid():
             updated_publisher = form.save()
             # register a different success message depending on whether the Publisher instance was created or updated.
             if publisher is None:
@@ -115,4 +133,42 @@ def publisher_edit(request, pk=None):
         # form fields are initialized with the data from the publisher object.
         form = PublisherForm(instance=publisher)
 
-    return render(request, "reviews/form-example.html", {"method": request.method, "form": form})
+    return render(request, "reviews/instance-form.html",
+                  {"instance": publisher, "model_type": Publisher, "form": form})
+
+
+def review_edit(request, book_pk, review_pk=None):
+    # get book object
+    book = get_object_or_404(Book, pk=book_pk)
+
+    # validation for reviews (updating an existent review or creating a new one)
+    if review_pk is not None:
+        review = get_object_or_404(Review, book_id=book_pk, pk=review_pk)
+    else:
+        review = None
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+
+        if form.is_valid():
+            updated_review = form.save(False)
+            updated_review.book = book
+
+            if review is None:
+                messages.success(request, "Review for book \"{}\" created successfully.".format(book.title))
+
+            else:
+                # Updating date_edited for an edited review
+                updated_review.date_edited = timezone.now()
+                messages.success(request, "Review for book \"{}\" updated successfully.".format(book.title))
+
+            # save updated_review manually since we passed the argument False in line 138
+            updated_review.save()
+            return redirect("book_details", book.pk)
+
+    else:
+        form = ReviewForm(instance=review)
+
+    return render(request, "reviews/instance-form.html",
+                  {"instance": review, "model_type": "Review", "form": form,
+                   "related_model_type": "Book", "related_instance": book})
