@@ -1,10 +1,11 @@
+from PIL import Image
 from django.db.models import Avg, Q
 from django.db.models.functions import Round
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 
-from .forms import SearchForm, PublisherForm, ReviewForm
+from .forms import SearchForm, PublisherForm, ReviewForm, BookMediaForm
 from .models import *
 from .utils import average_rating
 
@@ -109,6 +110,7 @@ def book_details(request, pk):
         }
     return render(request, 'reviews/book_details.html', context)
 
+
 def publisher_edit(request, pk=None):
     # validating is we are editing an existing publisher record or creating a new one
     if pk is not None:
@@ -172,3 +174,33 @@ def review_edit(request, book_pk, review_pk=None):
     return render(request, "reviews/instance-form.html",
                   {"instance": review, "model_type": "Review", "form": form,
                    "related_model_type": "Book", "related_instance": book})
+
+
+def book_media(request, pk):
+    # get the book with the pk
+    book = get_object_or_404(Book, pk=pk)
+
+    if request.method == 'POST':
+        form = BookMediaForm(request.POST, request.FILES, instance=book)
+
+        if form.is_valid():
+            # save set to "false" to allow us first to resize the image and then save it manually
+            book = form.save(False)
+
+            cover_file = form.cleaned_data.get('cover')
+            if cover_file:
+                image = Image.open(cover_file.file)
+                image.thumbnail((300, 300))
+
+                # save the resized image directly to the book.cover field
+                book.cover.save(cover_file.name, cover_file)
+
+            #  success message after upload image
+            messages.success(request, "The image for book \"{}\" was updated successfully.".format(book))
+            return redirect("book_details", book.pk)
+
+    else:
+        form = BookMediaForm(instance=book)
+
+    return render(request, "reviews/instance-form.html",
+                  {"instance": book, "form": form, "model_type": "Book", "is_file_upload": True})

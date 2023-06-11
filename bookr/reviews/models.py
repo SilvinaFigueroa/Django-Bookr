@@ -28,6 +28,9 @@ class Book(models.Model):
     contributors = models.ManyToManyField('Contributor',
                                           through="BookContributor")
 
+    cover = models.ImageField(upload_to="book_covers/", null=True, blank=True)
+    sample = models.FileField(upload_to="book_samples/", null=True, blank=True)
+
     def isbn13(self):
         """ '9780316769174' => '978-0-31-676917-4' """
         return "{}-{}-{}-{}-{}".format \
