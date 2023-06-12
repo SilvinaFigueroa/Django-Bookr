@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, api_views
 
 urlpatterns = [
     path('', views.index),
@@ -13,5 +13,8 @@ urlpatterns = [
     path('books/<int:book_pk>/reviews/new/', views.review_edit, name='review_create'),
     path('books/<int:book_pk>/reviews/<int:review_pk>/', views.review_edit, name='review_edit'),
     path('books/<int:pk>/media/', views.book_media, name='book_media'),
+    # class-based view, we added .as_view() method
+    path('api/all_books/', api_views.AllBooks.as_view(), name='all_books'),
+    path('api/contributors/', api_views.ContributorView.as_view(), name='contributors')
 
 ]

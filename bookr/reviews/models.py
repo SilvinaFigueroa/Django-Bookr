@@ -54,6 +54,8 @@ class Contributor(models.Model):
     def __str__(self):
         return self.initialled_name()
 
+    def number_contributions(self):
+        return self.bookcontributor_set.count()
 
 class BookContributor(models.Model):
     """ intermediary table  to establish relationships by using foreign keys to both the Book and Contributor tables """
